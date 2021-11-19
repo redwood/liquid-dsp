@@ -22,9 +22,6 @@ GENERATOR:
           "-L${SRCDIR}/..",
           "-lliquid"
       ]}
-#cgo linux LDFLAGS: -L${SRCDIR}/libgit2-static/linux -lgit2
-#cgo linux pkg-config: --static ${SRCDIR}/libgit2-static/linux/libgit2.pc
-
 
 PARSER:
   IncludePaths:
@@ -41,30 +38,39 @@ PARSER:
 TRANSLATOR:
     ConstRules:
         defines: eval
+        enum: eval
     Rules:
         global:
             - {transform: lower}
-            - {action: accept, from: "^gmskmod"}
-            - {action: accept, from: "^gmskdem"}
-            - {action: accept, from: "^liquid_float_complex"}
+            # - {action: accept, from: "^gmskmod"}
+            # - {action: accept, from: "^gmskdem"}
+            - {action: accept, from: "^modulation_scheme$"}
+            - {action: accept, from: "^crc_scheme$"}
+            - {action: accept, from: "^fec_scheme$"}
+            - {action: accept, from: "^LIQUID_MODEM_"}
+            - {action: accept, from: "^LIQUID_CRC_"}
+            - {action: accept, from: "^LIQUID_FEC_"}
+            - {action: accept, from: "^qpacketmodem"}
+            - {action: accept, from: "^count_bit_errors_array$"}
+            - {action: accept, from: "^randnf$"}
             - {transform: export}
-        type:
-            - {action: replace, from: "_s$", to: "_t"}
-            - {action: replace, from: "_t$"}
-        private:
-            - {transform: unexport}
+        # type:
+        #     - {action: replace, from: "_s$", to: "_t"}
+        #     - {action: replace, from: "_t$"}
+        # private:
+        #     - {transform: unexport}
         # function:
         #     - {action: replace, from: "^Gmskmod_([a-zA-Z0-9]+)", to: "(Q GMSKMod) $1"}
         post-global:
             # - {action: replace, from: "_q Gmskmod", to: "("}
-            - {action: replace, from: "Gmskmod", to: GMSKMod}
-            - {action: replace, from: "Gmskdem", to: GMSKDemod}
+            # - {action: replace, from: "Gmskmod", to: GMSKMod}
+            # - {action: replace, from: "Gmskdem", to: GMSKDemod}
             - {action: replace, from: _$}
             - {load: snakecase}
-            # - {action: replace, from: "^Complexfloat$", to: "complex64"}
-    PtrTips:
-        function:
-            - {target: "^gmskmod_modulate$", tips: [0, 0, arr]}
+            - {action: replace, from: "^Complexfloat$", to: "complex64"}
+    # PtrTips:
+    #     function:
+    #         - {target: "^gmskmod_modulate$", tips: [0, 0, sref]}
     # TypeTips:
     #     function:
     #         - {target: "^gmskmod_modulate$", tips: [0, 0, plain]}

@@ -411,11 +411,11 @@ void iirdes_dzpk2sosf(float complex * _zd,
 //  _n      :   low-pass filter order
 //  _zdt    :   digital zeros transformed [length: _n]
 //  _pdt    :   digital poles transformed [length: _n]
-void iirdes_dzpk_lp2hp(liquid_float_complex * _zd,
-                       liquid_float_complex * _pd,
+void iirdes_dzpk_lp2hp(float complex * _zd,
+                       float complex * _pd,
                        unsigned int _n,
-                       liquid_float_complex * _zdt,
-                       liquid_float_complex * _pdt)
+                       float complex * _zdt,
+                       float complex * _pdt)
 {
     unsigned int i;
     for (i=0; i<_n; i++) {
@@ -432,12 +432,12 @@ void iirdes_dzpk_lp2hp(liquid_float_complex * _zd,
 //  _f0     :   center frequency
 //  _zdt    :   digital zeros transformed [length: 2*_n]
 //  _pdt    :   digital poles transformed [length: 2*_n]
-void iirdes_dzpk_lp2bp(liquid_float_complex * _zd,
-                       liquid_float_complex * _pd,
+void iirdes_dzpk_lp2bp(float complex * _zd,
+                       float complex * _pd,
                        unsigned int _n,
                        float _f0,
-                       liquid_float_complex * _zdt,
-                       liquid_float_complex * _pdt)
+                       float complex * _zdt,
+                       float complex * _pdt)
 {
     // 
     float c0 = cosf(2*M_PI*_f0);

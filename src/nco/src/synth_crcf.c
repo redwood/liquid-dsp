@@ -28,6 +28,6 @@
 
 #define SYNTH(name)   LIQUID_CONCAT(synth_crcf,name)
 #define T           float
-#define TC          liquid_float_complex
+#define TC          float complex
 
 #include "synth.c"

@@ -42,9 +42,9 @@
 //  _pa     :   output analog poles [length: _n]
 //  _ka     :   output analog gain
 void butter_azpkf(unsigned int _n,
-                  liquid_float_complex * _za,
-                  liquid_float_complex * _pa,
-                  liquid_float_complex * _ka)
+                  float complex * _za,
+                  float complex * _pa,
+                  float complex * _ka)
 {
     unsigned int r = _n%2;
     unsigned int L = (_n - r)/2;

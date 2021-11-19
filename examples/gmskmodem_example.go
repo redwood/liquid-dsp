@@ -6,19 +6,19 @@ import (
 	"math/rand"
 	"os"
 
-	dsp "github.com/redwood/liquiddsp-go"
+	dsp "github.com/redwood/liquid-dsp/liquiddsp"
 )
 
 func main() {
 	// options
 	var (
-		k              uint32  = 4    // filter samples/symbol
-		m              uint32  = 3    // filter delay (symbols)
-		bt             float32 = 0.3  // bandwidth-time product
-		numDataSymbols uint32  = 200  // number of data symbols
-		SNRdB          float   = 30.0 // signal-to-noise ratio [dB]
-		phi            float   = 0.0  // carrier phase offset
-		dphi           float   = 0.0  // carrier frequency offset
+		k              uint32  = 4   // filter samples/symbol
+		m              uint32  = 3   // filter delay (symbols)
+		bt             float32 = 0.3 // bandwidth-time product
+		numDataSymbols uint32  = 200 // number of data symbols
+		// SNRdB          float32 = 30.0 // signal-to-noise ratio [dB]
+		// phi            float32 = 0.0  // carrier phase offset
+		// dphi           float32 = 0.0  // carrier frequency offset
 	)
 
 	// int dopt;
@@ -46,7 +46,7 @@ func main() {
 	var (
 		numSymbols uint32 = numDataSymbols + 2*m
 		numSamples uint32 = k * numSymbols
-		nstd              = math.Pow(10, -SNRdB/20) // noise standard deviation
+		// nstd              = float32(math.Pow(10, float64(-SNRdB/20))) // noise standard deviation
 	)
 
 	// create modulator
@@ -54,52 +54,58 @@ func main() {
 	dsp.GMSKModPrint(mod)
 
 	// create demodulator
-	demod := dsp.GMSKDemCreate(k, m, bt)
-	dsp.GMSKDemSetEqBw(demod, 0.01)
-	dsp.GMSKDemPrint(demod)
+	demod := dsp.GMSKDemodCreate(k, m, bt)
+	dsp.GMSKDemodSetEqBw(demod, 0.01)
+	dsp.GMSKDemodPrint(demod)
 
 	var (
 		i       uint32
-		s       [numSymbols]uint32
-		x       [numSamples]dsp.LiquidFloatComplex
-		y       [numSamples]dsp.LiquidFloatComplex
-		sym_out [numSymbols]uint32
+		s       = make([]uint32, numSymbols)
+		x       = make([]complex64, numSamples)
+		y       = make([]complex64, numSamples)
+		sym_out = make([]uint32, numSymbols)
 	)
 
 	// generate random data sequence
-	for i := 0; i < numSymbols; i++ {
-		s[i] = uint32(rand.Int31n(math.MaxUint32)) % 2
+	for i := 0; i < int(numSymbols); i++ {
+		s[i] = uint32(rand.Int31n(math.MaxInt32)) % 2
 	}
 
 	// modulate signal
-	for i := 0; i < numSymbols; i++ {
-		dsp.GMSKModModulate(mod, s[i], &x[k*i])
+	for i := uint32(0); i < numSymbols; i++ {
+		ret := dsp.GMSKModModulate(mod, s[i], x[k*i:])
+		if ret != 0 {
+			panic(ret)
+		}
 	}
 
 	// add channel impairments
-	// for i :=0; i<numSamples; i++ {
-	//     y[i]  = x[i]*cexpf(_Complex_I*(phi + i*dphi))
-	//     y[i] += nstd*(randnf() + _Complex_I*randnf())*M_SQRT1_2
-	// }
+	for i := uint32(0); i < numSamples; i++ {
+		y[i] = x[i] //*cexpf(_Complex_I*(phi + i*dphi))
+		// y[i] += nstd*(randnf() + _Complex_I*randnf())*M_SQRT1_2
+	}
 
 	// demodulate signal
 	for i = 0; i < numSymbols; i++ {
-		dsp.GMSKDemDemodulate(demod, &y[k*i], &sym_out[i])
+		ret := dsp.GMSKDemodDemodulate(demod, y[k*i:], sym_out[i:])
+		if ret != 0 {
+			panic(ret)
+		}
 	}
 
 	// destroy modem objects
 	dsp.GMSKModDestroy(mod)
-	dsp.GMSKDemDestroy(demod)
+	dsp.GMSKDemodDestroy(demod)
 
 	// print results to screen
 	delay := 2 * m
 	numErrors := 0
 	for i := delay; i < numSymbols; i++ {
 		if s[i-delay] != sym_out[i] {
-			numErrors += 1
+			numErrors++
 		}
 	}
-	fmt.Printf("symbol errors : %4u / %4u\n", numErrors, numDataSymbols)
+	fmt.Printf("symbol errors : %v / %v\n", numErrors, numDataSymbols)
 
 	//     // write results to output file
 	//     FILE * fid = fopen(OUTPUT_FILENAME,"w");

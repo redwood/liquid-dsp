@@ -766,7 +766,7 @@ int fft_is_radix2(unsigned int _n);
 unsigned int fft_reverse_index(unsigned int _i, unsigned int _n);
 
 
-LIQUID_FFT_DEFINE_INTERNAL_API(LIQUID_FFT_MANGLE_FLOAT, float, liquid_float_complex)
+LIQUID_FFT_DEFINE_INTERNAL_API(LIQUID_FFT_MANGLE_FLOAT, float, float complex)
 
 // Use fftw library if installed (and not overridden with configuration),
 // otherwise use internal (less efficient) fft library.
@@ -1138,7 +1138,7 @@ int QSOURCE(_generate)(QSOURCE() _q,                                        \
 int QSOURCE(_generate_into)(QSOURCE() _q,                                   \
                             TO *      _buf);                                \
     
-LIQUID_QSOURCE_DEFINE_API(LIQUID_QSOURCE_MANGLE_CFLOAT, liquid_float_complex)
+LIQUID_QSOURCE_DEFINE_API(LIQUID_QSOURCE_MANGLE_CFLOAT, float complex)
 
 //
 // MODULE : math
@@ -1241,7 +1241,7 @@ T    MATRIX(_det2x2)(T * _x,                                    \
 LIQUID_MATRIX_DEFINE_INTERNAL_API(LIQUID_MATRIX_MANGLE_FLOAT,   float)
 LIQUID_MATRIX_DEFINE_INTERNAL_API(LIQUID_MATRIX_MANGLE_DOUBLE,  double)
 
-LIQUID_MATRIX_DEFINE_INTERNAL_API(LIQUID_MATRIX_MANGLE_CFLOAT,  liquid_float_complex)
+LIQUID_MATRIX_DEFINE_INTERNAL_API(LIQUID_MATRIX_MANGLE_CFLOAT,  float complex)
 LIQUID_MATRIX_DEFINE_INTERNAL_API(LIQUID_MATRIX_MANGLE_CDOUBLE, liquid_double_complex)
 
 // search for index placement in list
@@ -1562,7 +1562,7 @@ void SYNTH(_pll_reset)(SYNTH() _q);                             \
 // Define nco internal APIs
 LIQUID_SYNTH_DEFINE_INTERNAL_API(SYNTH_MANGLE_FLOAT,
                                  float,
-                                 liquid_float_complex)
+                                 float complex)
 // 
 // MODULE : optim (non-linear optimization)
 //

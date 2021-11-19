@@ -447,7 +447,7 @@ int qdetector_cccf_execute_seek(qdetector_cccf _q,
     if (g0 < 1e-10) {
         memmove(_q->buf_time_0,
                 _q->buf_time_0 + _q->nfft / 2,
-                (_q->nfft / 2) * sizeof(liquid_float_complex));
+                (_q->nfft / 2) * sizeof(float complex));
 
         // swap accumulated signal levels
         _q->x2_sum_0 = _q->x2_sum_1;

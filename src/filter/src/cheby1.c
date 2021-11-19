@@ -46,9 +46,9 @@
 //  _ka     :   output analog gain
 void cheby1_azpkf(unsigned int _n,
                   float _ep,
-                  liquid_float_complex * _za,
-                  liquid_float_complex * _pa,
-                  liquid_float_complex * _ka)
+                  float complex * _za,
+                  float complex * _pa,
+                  float complex * _ka)
 {
     // temporary values
     float t0 = sqrt(1.0 + 1.0/(_ep*_ep));

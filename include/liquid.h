@@ -135,18 +135,20 @@ const char *        liquid_error_info(liquid_error_code _code);
  * define complex type compatible with the C++ complex standard,
  * otherwise resort to defining binary compatible array.
  */
-#if LIQUID_USE_COMPLEX_H==1
+// #if LIQUID_USE_COMPLEX_H==1
 #   include <complex.h>
-#   define LIQUID_DEFINE_COMPLEX(R,C) typedef R _Complex C
-#elif defined _GLIBCXX_COMPLEX || defined _LIBCPP_COMPLEX
-#   define LIQUID_DEFINE_COMPLEX(R,C) typedef std::complex<R> C
-#else
-#   define LIQUID_DEFINE_COMPLEX(R,C) typedef struct {R real; R imag;} C;
-#endif
+// #   define LIQUID_DEFINE_COMPLEX(R,C) typedef R _Complex C
+#  define liquid_float_complex float complex
+#  define liquid_double_complex double complex
+// #elif defined _GLIBCXX_COMPLEX || defined _LIBCPP_COMPLEX
+// #   define LIQUID_DEFINE_COMPLEX(R,C) typedef std::complex<R> C
+// #else
+// #   define LIQUID_DEFINE_COMPLEX(R,C) typedef struct {R real; R imag;} C;
+// #endif
 //#   define LIQUID_DEFINE_COMPLEX(R,C) typedef R C[2]
 
-LIQUID_DEFINE_COMPLEX(float,  liquid_float_complex);
-LIQUID_DEFINE_COMPLEX(double, liquid_double_complex);
+// LIQUID_DEFINE_COMPLEX(float,  liquid_float_complex);
+// LIQUID_DEFINE_COMPLEX(double, liquid_double_complex);
 
 //
 // MODULE : agc (automatic gain control)
@@ -7496,7 +7498,7 @@ int gmskmod_print(gmskmod _q);
 int gmskmod_reset(gmskmod _q);
 int gmskmod_modulate(gmskmod                _q,
                      unsigned int           _sym,
-                     liquid_float_complex * _y);
+                     float complex * _y);
 
 
 // gmskdem : GMSK demodulator
@@ -7514,7 +7516,7 @@ int gmskdem_print(gmskdem _q);
 int gmskdem_reset(gmskdem _q);
 int gmskdem_set_eq_bw(gmskdem _q, float _bw);
 int gmskdem_demodulate(gmskdem                _q,
-                       liquid_float_complex * _y,
+                       float complex * _y,
                        unsigned int *         _sym);
 
 //
