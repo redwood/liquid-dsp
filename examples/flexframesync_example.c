@@ -113,6 +113,11 @@ int main(int argc, char *argv[])
     float complex x[buf_len];
     float complex y[buf_len];
 
+    for (i = 0; i < buf_len; i++) {
+        x[i] = i;
+        printf("x[i] = %g%+gi\n", creal(x[i]), cimag(x[i]));
+    }
+
     int frame_complete = 0;
     float phi = 0.0f;
     while (!frame_complete) {
@@ -159,8 +164,10 @@ static int callback(unsigned char *  _header,
     // count bit errors (assuming all-zero message)
     unsigned int bit_errors = 0;
     unsigned int i;
-    for (i=0; i<_payload_len; i++)
+    for (i=0; i<_payload_len; i++) {
         bit_errors += liquid_count_ones(_payload[i]);
+        printf("%d", _payload[i]);
+    }
 
     framesyncstats_print(&_stats);
     printf("    header crc          :   %s\n", _header_valid ?  "pass" : "FAIL");

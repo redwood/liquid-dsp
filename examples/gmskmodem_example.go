@@ -61,8 +61,8 @@ func main() {
 	var (
 		i       uint32
 		s       = make([]uint32, numSymbols)
-		x       = make([]complex64, numSamples)
-		y       = make([]complex64, numSamples)
+		x       = make([]dsp.Complexfloat, numSamples)
+		y       = make([]dsp.Complexfloat, numSamples)
 		sym_out = make([]uint32, numSymbols)
 	)
 

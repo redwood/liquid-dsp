@@ -347,6 +347,8 @@ int flexframegen_assemble(flexframegen          _q,
                           const unsigned char * _payload,
                           unsigned int          _payload_dec_len)
 {
+    printf("--- flexframegen_assemble: %d\n", _payload_dec_len);
+
     // reset object
     flexframegen_reset(_q);
 
@@ -407,8 +409,11 @@ int flexframegen_write_samples(flexframegen    _q,
                                float complex * _buffer,
                                unsigned int    _buffer_len)
 {
+    printf("--- flexframegen_write_samples( %d )\n", _buffer_len);
+
     unsigned int i;
     for (i=0; i<_buffer_len; i++) {
+        // printf("--- flexframegen_write_samples: i = %d\n", i);
         // determine if new sample needs to be written
         if (_q->sample_counter == 0) {
             // generate new symbol

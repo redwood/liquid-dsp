@@ -24,6 +24,18 @@ void usage()
     printf("  n     : number of frames, default: 3\n");
 }
 
+float myrandf(float max) {
+    return (float)rand()/(float)(RAND_MAX/max);
+}
+
+static int callback(unsigned char *  _header,
+                    int              _header_valid,
+                    unsigned char *  _payload,
+                    unsigned int     _payload_len,
+                    int              _payload_valid,
+                    framesyncstats_s _stats,
+                    void *           _userdata);
+
 int main(int argc, char *argv[]) {
     srand( time(NULL) );
 
@@ -55,7 +67,7 @@ int main(int argc, char *argv[]) {
     unsigned char * payload = NULL;
 
     // create flexframesync object with default properties
-    flexframesync fs = flexframesync_create(NULL,NULL);
+    flexframesync fs = flexframesync_create(callback,NULL);
 
     // channel
     float nstd  = powf(10.0f, noise_floor/20.0f);         // noise std. dev.
@@ -72,6 +84,12 @@ int main(int argc, char *argv[]) {
 
     unsigned int j;
     for (j=0; j<num_frames; j++) {
+        // unsigned int noise_len = rand() % 100;
+        // for (i=0; i<noise_len; i++) {
+        //     buf[i] = myrandf(1.0f) + _Complex_I*myrandf(1.0f);
+        // }
+        // flexframesync_execute(fs, buf, buf_len);
+
         // configure frame generator properties
         unsigned int payload_len = (rand() % 256) + 1;   // random payload length
         fgprops.check            = LIQUID_CRC_NONE;      // data validity check
@@ -89,6 +107,11 @@ int main(int argc, char *argv[]) {
         // set properties and assemble the frame
         flexframegen_setprops(fg, &fgprops);
         flexframegen_assemble(fg, header, payload, payload_len);
+
+        flexframegenprops_s props;
+        flexframegen_getprops(fg, &props);
+        printf("PROPS = { %d, %d, %d, %d }\n", props.check, props.fec0, props.fec1, props.mod_scheme);
+
         printf("frame %u, ", j);
         flexframegen_print(fg);
 
@@ -99,12 +122,18 @@ int main(int argc, char *argv[]) {
             frame_complete = flexframegen_write_samples(fg, buf, buf_len);
 
             // add channel impairments (gain and noise)
-            for (i=0; i<buf_len; i++)
-                buf[i] = buf[i]*gamma + nstd * (randnf() + _Complex_I*randnf()) * M_SQRT1_2;
+            // for (i=0; i<buf_len; i++)
+            //     buf[i] = buf[i]*gamma + nstd * (randnf() + _Complex_I*randnf()) * M_SQRT1_2;
 
             // push through sync
             flexframesync_execute(fs, buf, buf_len);
         }
+
+        // unsigned int noise_len = rand() % 100;
+        // for (i=0; i<noise_len; i++) {
+        //     buf[i] = myrandf(1.0f) + _Complex_I*myrandf(1.0f);
+        // }
+        // flexframesync_execute(fs, buf, buf_len);
 
     } // num frames
 
@@ -120,3 +149,30 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+static int callback(unsigned char *  _header,
+                    int              _header_valid,
+                    unsigned char *  _payload,
+                    unsigned int     _payload_len,
+                    int              _payload_valid,
+                    framesyncstats_s _stats,
+                    void *           _userdata)
+{
+    printf("******** callback invoked\n");
+
+    // count bit errors (assuming all-zero message)
+    unsigned int bit_errors = 0;
+    unsigned int i;
+    for (i=0; i<_payload_len; i++) {
+        bit_errors += liquid_count_ones(_payload[i]);
+        printf("%d", _payload[i]);
+    }
+    printf("\n");
+
+    framesyncstats_print(&_stats);
+    printf("    header crc          :   %s\n", _header_valid ?  "pass" : "FAIL");
+    printf("    payload length      :   %u\n", _payload_len);
+    printf("    payload crc         :   %s\n", _payload_valid ?  "pass" : "FAIL");
+    printf("    payload bit errors  :   %u / %u\n", bit_errors, 8*_payload_len);
+
+    return 0;
+}

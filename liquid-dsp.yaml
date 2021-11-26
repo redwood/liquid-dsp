@@ -11,6 +11,8 @@ GENERATOR:
         - complex.h
     FlagGroups:
       - {name: "CFLAGS", flags: [
+          # "-std=gnu++11",
+          # "-fext-numeric-literals",
           "-msse4.1",
           "-Wall",
           "-fPIC",
@@ -19,8 +21,8 @@ GENERATOR:
           "-I../include",
       ]}
       - {name: "LDFLAGS", flags: [
-          "-L${SRCDIR}/..",
-          "-lliquid"
+          "-lm",
+          "${SRCDIR}/../libliquid.a",
       ]}
 
 PARSER:
@@ -28,12 +30,14 @@ PARSER:
       - /usr/include
       - /usr/include/linux
       - include/
+      - liquiddsp/
   SourcesPaths:
       - include/liquid.h
       - include/liquid.internal.h
   Defines:
       __linux__: 1
-      HAVE_COMPLEX_H: 1
+      # HAVE_COMPLEX_H: 1
+      # LIQUID_USE_COMPLEX_H: 1
 
 TRANSLATOR:
     ConstRules:
@@ -44,6 +48,7 @@ TRANSLATOR:
             - {transform: lower}
             # - {action: accept, from: "^gmskmod"}
             # - {action: accept, from: "^gmskdem"}
+            # - {action: accept, from: "^liquid_float_complex$"}
             - {action: accept, from: "^modulation_scheme$"}
             - {action: accept, from: "^crc_scheme$"}
             - {action: accept, from: "^fec_scheme$"}
@@ -51,14 +56,32 @@ TRANSLATOR:
             - {action: accept, from: "^LIQUID_CRC_"}
             - {action: accept, from: "^LIQUID_FEC_"}
             - {action: accept, from: "^qpacketmodem"}
+            # - {action: replace, from: "^flexframesync_create", to: "XXXX_flexframesync_create_BROKEN"}
+            - {action: accept, from: "^flexframesync"}
+            - {action: accept, from: "^flexframegen"}
+            # - {action: accept, from: "^framesync_callback"}
+            - {action: accept, from: "^framesyncstats"}
+            - {action: accept, from: "^framedata"}
             - {action: accept, from: "^count_bit_errors_array$"}
+            - {action: accept, from: "^liquid_count_ones$"}
             - {action: accept, from: "^randnf$"}
+            - {action: replace, from: "^flexframesync_reset_framedatastats", to: "flex_frame_sync_reset_frame_data_stats"}
+            - {action: replace, from: "^flexframesync_get_framedatastats", to: "flex_frame_sync_get_frame_data_stats"}
+            - {action: replace, from: "^framesync_callback", to: "frame_sync_callback"}
+            - {action: replace, from: "^flexframesync", to: "flex_frame_sync"}
+            - {action: replace, from: "^flexframegenprops", to: "flex_frame_gen_props"}
+            - {action: replace, from: "getprops", to: "get_props"}
+            - {action: replace, from: "setprops", to: "set_props"}
+            - {action: replace, from: "getframelen", to: "get_frame_len"}
+            - {action: replace, from: "^flexframegen", to: "flex_frame_gen"}
+            - {action: replace, from: "^framesyncstats", to: "frame_sync_stats"}
+            - {action: replace, from: "^framedatastats", to: "frame_data_stats"}
             - {transform: export}
-        # type:
-        #     - {action: replace, from: "_s$", to: "_t"}
-        #     - {action: replace, from: "_t$"}
-        # private:
-        #     - {transform: unexport}
+        type:
+            - {action: replace, from: "_s$", to: "_t"}
+            - {action: replace, from: "_t$"}
+        private:
+            - {transform: unexport}
         # function:
         #     - {action: replace, from: "^Gmskmod_([a-zA-Z0-9]+)", to: "(Q GMSKMod) $1"}
         post-global:
@@ -67,10 +90,22 @@ TRANSLATOR:
             # - {action: replace, from: "Gmskdem", to: GMSKDemod}
             - {action: replace, from: _$}
             - {load: snakecase}
-            - {action: replace, from: "^Complexfloat$", to: "complex64"}
-    # PtrTips:
-    #     function:
-    #         - {target: "^gmskmod_modulate$", tips: [0, 0, sref]}
-    # TypeTips:
-    #     function:
-    #         - {target: "^gmskmod_modulate$", tips: [0, 0, plain]}
+            # - {action: replace, from: "^Complexfloat$", to: "complex64"}
+    PtrTips:
+        type:
+            - {target: "^framesyncstats_s$", tips: [0, 0, 0, arr, 0, 0, 0, 0, 0, 0]}
+        function:
+            - {target: "^flexframegenprops_init_default$", tips: [sref]}
+            - {target: "^flexframegen_write_samples$", tips: [0, ref, 0]}
+            - {target: "^flexframegen_getprops$", tips: [0, sref]}
+            - {target: "^flexframegen_setprops$", tips: [0, sref]}
+            - {target: "^flexframegen_set_header_props$", tips: [0, sref]}
+            - {target: "^flexframegen_create$", tips: [sref]}
+            - {target: "^flexframesync_set_header_props$", tips: [0, sref]}
+            - {target: "^flexframesync_execute$", tips: [0, ref, 0]}
+            - {target: "^framesyncstats_print$", tips: [ref]}
+    TypeTips:
+        type:
+            - {target: "^framesyncstats_s$", tips: [0, 0, 0, 0, 0, plain, 0, 0, 0, 0]}
+        function:
+            - {target: "^flexframegen_write_samples$", tips: [0, named, 0]}

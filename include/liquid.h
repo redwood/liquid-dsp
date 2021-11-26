@@ -137,9 +137,9 @@ const char *        liquid_error_info(liquid_error_code _code);
  */
 // #if LIQUID_USE_COMPLEX_H==1
 #   include <complex.h>
-// #   define LIQUID_DEFINE_COMPLEX(R,C) typedef R _Complex C
-#  define liquid_float_complex float complex
-#  define liquid_double_complex double complex
+#   define LIQUID_DEFINE_COMPLEX(R,C) typedef R _Complex C
+// #  define float _Complex liquid_float_complex
+// #  define double _Complex liquid_double_complex
 // #elif defined _GLIBCXX_COMPLEX || defined _LIBCPP_COMPLEX
 // #   define LIQUID_DEFINE_COMPLEX(R,C) typedef std::complex<R> C
 // #else
@@ -147,8 +147,8 @@ const char *        liquid_error_info(liquid_error_code _code);
 // #endif
 //#   define LIQUID_DEFINE_COMPLEX(R,C) typedef R C[2]
 
-// LIQUID_DEFINE_COMPLEX(float,  liquid_float_complex);
-// LIQUID_DEFINE_COMPLEX(double, liquid_double_complex);
+LIQUID_DEFINE_COMPLEX(float,  liquid_float_complex);
+LIQUID_DEFINE_COMPLEX(double, liquid_double_complex);
 
 //
 // MODULE : agc (automatic gain control)
